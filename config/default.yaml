@@ -1,0 +1,36 @@
+dynamodb:
+  indexKeys:
+    lsi1:
+      documentName: 'Organization'
+      sk: '#createdAt'
+
+    lsi2:
+      documentName: 'Asset'
+      sk: '#status#createdAt'
+
+    lsi3:
+      documentName: 'Activity'
+      sk: '#createdAt'
+
+    gsi1:
+      Activity:
+        pk: '#partition#userId'
+        sk: '#createdAt'
+
+      Asset:
+        pk: '#partition#createdBy'
+        sk: '#status#createdAt'
+
+      Organization:
+        pk: 'PLATFORM'
+        sk: '#status#createdAt'
+
+    gsi2:
+      Activity:
+        pk: '#partition#operationId'
+        sk: '#createdAt'
+
+idPrefixes:
+  Asset: 'AST'
+  Activity: 'ACT'
+  Organization: 'O'
