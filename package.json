@@ -1,6 +1,6 @@
 {
   "name": "@kravc/dos-dynamodb",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.3",
   "description": "CRUD interface for DynamoDB table to be used with @kravc/dos service.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

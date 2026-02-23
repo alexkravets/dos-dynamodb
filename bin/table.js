@@ -76,7 +76,7 @@ const run = async callback => {
     return callback();
   }
 
-  const command = exec('docker compose -f node_modules/@kravc/dos-dynamodb/docker-compose.yaml up -d', callback);
+  const command = exec('docker compose --project-name dos -f node_modules/@kravc/dos-dynamodb/docker-compose.yaml up -d', callback);
   command.stdout.on('data', data => console.log(data));
   command.stderr.on('data', data => console.error(data));
 };
