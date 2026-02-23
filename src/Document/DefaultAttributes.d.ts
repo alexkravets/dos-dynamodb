@@ -1,4 +1,4 @@
-import { DefaultAttributes as CommonAttributes } from '@kravc/dos';
+import type { DefaultAttributes as CommonAttributes } from '@kravc/dos';
 
 export interface DefaultAttributes extends CommonAttributes {
   _lsi1SortKey?: string;

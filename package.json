@@ -28,8 +28,8 @@
     "@aws-sdk/client-dynamodb": "^3.995.0",
     "@aws-sdk/credential-providers": "^3.995.0",
     "@aws-sdk/lib-dynamodb": "^3.995.0",
-    "@kravc/dos": "^2.0.0-alpha.12",
-    "config": "^4.3.0",
+    "@kravc/dos": "^2.0.0-alpha.14",
+    "config": "^4.4.0",
     "hashids": "^2.3.0",
     "lodash": "^4.17.23"
   },

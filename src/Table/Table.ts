@@ -146,7 +146,7 @@ class Table {
         throw dynamoError;
       }
 
-      throw new Error(`Table "${TableName}" does not exist`);
+      throw new Error(`Table "${TableName}" does not exist`, { cause: dynamoError });
     }
 
     return true;
@@ -176,7 +176,7 @@ class Table {
         throw dynamoError;
       }
 
-      throw new Error(`Table "${TableName}" does not exist`);
+      throw new Error(`Table "${TableName}" does not exist`, { cause: dynamoError });
     }
 
     const { Item: itemAttributes } = result;
@@ -228,7 +228,7 @@ class Table {
         throw dynamoError;
       }
 
-      throw new Error(`Table "${TableName}" does not exist`);
+      throw new Error(`Table "${TableName}" does not exist`, { cause: dynamoError });
     }
 
     const { Attributes: attributes } = result;
@@ -270,7 +270,7 @@ class Table {
         throw dynamoError;
       }
 
-      throw new Error(`Table "${TableName}" does not exist`);
+      throw new Error(`Table "${TableName}" does not exist`, { cause: dynamoError });
     }
 
     return true;
@@ -293,7 +293,7 @@ class Table {
 
       const { TableName } = input;
 
-      throw new Error(`Table "${TableName}" does not exist`);
+      throw new Error(`Table "${TableName}" does not exist`, { cause: dynamoError });
     }
 
     return result;
@@ -317,10 +317,10 @@ class Table {
 
     const { limit } = options;
 
-    let count = 0;
+    let count: number;
     let items = [] as Record<string, unknown>[];
     let lastEvaluatedKey;
-    let isNextChunkRequired = true;
+    let isNextChunkRequired: boolean;
 
     do {
       const {

@@ -1,9 +1,10 @@
 import Document from './Document/Document';
 import DocumentWithHashId from './Document/DocumentWithHashId';
 import type { DefaultAttributes } from './Document/DefaultAttributes';
-import { ExpressionKey, SortExpressionKey } from './Table';
+import Table, { ExpressionKey, SortExpressionKey } from './Table';
 
 export {
+  Table,
   Document,
   ExpressionKey,
   SortExpressionKey,

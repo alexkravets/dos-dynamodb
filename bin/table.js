@@ -2,8 +2,10 @@
 
 'use strict';
 
-import Table from '../dist/src/Table';
-import { exec } from 'child_process';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { Table } = require('../dist/src');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { exec } = require('child_process');
 
 const command = process.argv[2];
 const isInvalidCommand = ![ 'up', 'create', 'delete', 'reset' ].includes(command);
@@ -33,7 +35,7 @@ const _action = async (methodName) => {
     partitionKey: 'partition',
   });
 
-  const { name: tableName } = table.config;
+  const { name: tableName } = table.options;
 
   try {
     await table[methodName]();
@@ -74,7 +76,7 @@ const run = async callback => {
     return callback();
   }
 
-  const command = exec('docker compose -f node_modules/@kravc/table/docker-compose.yaml up -d', callback);
+  const command = exec('docker compose -f node_modules/@kravc/dos-dynamodb/docker-compose.yaml up -d', callback);
   command.stdout.on('data', data => console.log(data));
   command.stderr.on('data', data => console.error(data));
 };
