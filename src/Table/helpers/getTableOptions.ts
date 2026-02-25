@@ -91,7 +91,7 @@ const getTableOptions = (partitionKey: string, sortKey: string): TableOptions =>
   tableOptions.primaryKey = primaryKey;
   tableOptions.isLocalhost = region === LOCAL_REGION;
 
-  tableOptions.localSecondaryIndexes = get(config, 'localSecondaryIndexes', [
+  tableOptions.localSecondaryIndexes = get(tableConfig, 'localSecondaryIndexes', [
     {
       name: 'lsi1',
       sortKey: '_lsi1SortKey',
@@ -106,7 +106,7 @@ const getTableOptions = (partitionKey: string, sortKey: string): TableOptions =>
     },
   ]) as LSI[];
 
-  tableOptions.globalSecondaryIndexes = get(config, 'globalSecondaryIndexes', [
+  tableOptions.globalSecondaryIndexes = get(tableConfig, 'globalSecondaryIndexes', [
     {
       name: 'gsi1',
       partitionKey: '_gsi1PartitionKey',

@@ -2,11 +2,6 @@
 
 'use strict';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { Table } = require('../dist/src');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { exec } = require('child_process');
-
 const command = process.argv[2];
 const isInvalidCommand = ![ 'up', 'create', 'delete', 'reset' ].includes(command);
 
@@ -27,6 +22,12 @@ if (env) {
   process.env.NODE_ENV = 'serverless';
   process.env.NODE_APP_INSTANCE = env;
 }
+
+// NOTE: It's important to require Table module after env has been adjusted:
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { Table } = require('../dist/src');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { exec } = require('child_process');
 
 /** Runs an action for a table. */
 const _action = async (methodName) => {
