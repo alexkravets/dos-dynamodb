@@ -35,10 +35,7 @@ const getAttributeDefinitions = (
     const { partitionKey, sortKey } = globalSecondaryIndexes[globalIndexKey];
 
     attributes.push(partitionKey);
-
-    if (sortKey) {
-      attributes.push(sortKey);
-    }
+    attributes.push(sortKey);
   }
 
   attributes = uniq(attributes);
@@ -64,14 +61,11 @@ const getSecondaryIndex = (
       KeyType: 'HASH',
       AttributeName: partitionKey
     },
-  ];
-
-  if (sortKey) {
-    KeySchema.push({
+    {
       KeyType: 'RANGE',
       AttributeName: sortKey
-    });
-  }
+    },
+  ];
 
   const index = {
     IndexName,
@@ -132,9 +126,19 @@ const buildTableSchema = ({
     TableName,
     KeySchema,
     AttributeDefinitions,
-    LocalSecondaryIndexes,
-    GlobalSecondaryIndexes,
   } as CreateTableInput;
+
+  const hasLocalSecondaryIndexes = LocalSecondaryIndexes.length > 0;
+
+  if (hasLocalSecondaryIndexes) {
+    schema.LocalSecondaryIndexes = LocalSecondaryIndexes;
+  }
+
+  const hasGlobalSecondaryIndexes = GlobalSecondaryIndexes.length > 0;
+
+  if (hasGlobalSecondaryIndexes) {
+    schema.GlobalSecondaryIndexes = GlobalSecondaryIndexes;
+  }
 
   /* istanbul ignore else */
   if (isLocalhost) {
