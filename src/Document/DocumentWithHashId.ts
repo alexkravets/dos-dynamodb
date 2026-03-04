@@ -11,7 +11,7 @@ const DEFAULT_NUMBER_KEY = 'number';
 class DocumentWithHashId<T> extends Document<T> {
   /** Returns salt for hash ID method. */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  static getSalt<T>(_context: Context, _attributes: T): string {
+  static getSalt(_context: Context, _attributes: unknown): string {
     return this.name;
   };
 
