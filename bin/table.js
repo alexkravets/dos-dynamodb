@@ -71,9 +71,30 @@ const _reset = async () => {
   await _create();
 };
 
-/** Starts dynamodb in the Docker and runs a command. */
+const isMac = process.platform === 'darwin';
+const CONTAINER_NAME = 'dynamo';
+const IMAGE = 'amazon/dynamodb-local:latest';
+
+/** Starts dynamodb and runs a command. */
 const run = async callback => {
   if (env) {
+    return callback();
+  }
+
+  if (isMac) {
+    const { spawnSync, execSync } = require('child_process');
+
+    const [info] = JSON.parse(spawnSync('container', ['inspect', CONTAINER_NAME], { encoding: 'utf8' }).stdout || '[]');
+
+    if (info) {
+      if (info.status === 'running') {
+        return callback();
+      }
+
+      execSync(`container rm ${CONTAINER_NAME}`, { stdio: 'inherit' });
+    }
+
+    execSync(`container run --detach --name ${CONTAINER_NAME} --publish 8000:8000 ${IMAGE}`, { stdio: 'inherit' });
     return callback();
   }
 
