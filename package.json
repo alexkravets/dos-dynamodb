@@ -12,12 +12,13 @@
     "src": "src"
   },
   "scripts": {
-    "test": "eslint --fix src/ example/ && npm run db:up && sleep 2 && jest --coverage",
+    "test": "eslint --fix src/ example/ && npm run db:up && NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "prebuild": "rimraf dist",
     "build": "tsc",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
-    "db:up": "docker compose --project-name dos -f ./docker-compose.yaml up -d"
+    "db:up": "node bin/db-up.js",
+    "db:down": "node bin/db-down.js"
   },
   "bin": {
     "table": "bin/table.js"

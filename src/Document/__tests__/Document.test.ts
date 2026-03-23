@@ -196,9 +196,9 @@ describe('Document', () => {
     beforeAll(async () => {
       await Asset.table.reset();
 
-      for (let i = 0; i < 600 + 15; i++) {
-        await createAsset({ name: `Text Document ${i + 1}` });
-      }
+      await Promise.all(
+        Array.from({ length: 600 + 15 }, (_, i) => createAsset({ name: `Text Document ${i + 1}` }))
+      );
 
       await createActivity();
     });

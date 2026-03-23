@@ -20,11 +20,54 @@ List supported DynamoDB table commands:
 npx table
 ```
 
+## Development
+
+Tests require DynamoDB Local to be running on port 8000.
+
+**macOS** — uses [apple/container](https://github.com/apple/container) (requires macOS 26+):
+
+```sh
+container system start
+npm test
+```
+
+To start the container service automatically at login:
+
+```sh
+cat > ~/Library/LaunchAgents/com.apple.container.start.plist << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.apple.container.start</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/container</string>
+    <string>system</string>
+    <string>start</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>
+EOF
+launchctl load ~/Library/LaunchAgents/com.apple.container.start.plist
+```
+
+**Linux** — uses Docker:
+
+```sh
+npm test
+```
+
+`npm run db:up` starts the container (skips if already running). `npm run db:down` stops and removes it.
+
 ## License
 
 ISC
 
 ---
 
-Revision: February 21, 2026<br/>
+Revision: March 23, 2026<br/>
 By: Oleksandr Kravets (@alexkravets)
