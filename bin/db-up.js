@@ -30,7 +30,7 @@ const waitForDynamo = (timeout = 10000) => new Promise(resolve => {
 const main = async () => {
   if (isMac) {
     const serviceCheck = spawnSync('container', ['system', 'status'], { encoding: 'utf8' });
-    const isServiceRunning = serviceCheck.stdout?.includes('is running');
+    const isServiceRunning = serviceCheck.stdout?.includes('running');
 
     if (!isServiceRunning) {
       console.error('Error: Apple container system service is not running.');
@@ -39,10 +39,9 @@ const main = async () => {
     }
 
     const result = spawnSync('container', ['inspect', CONTAINER_NAME], { encoding: 'utf8' });
+    const [info] = JSON.parse(result.stdout || '[]');
 
-    if (result.status === 0) {
-      const [info] = JSON.parse(result.stdout);
-
+    if (info) {
       if (info.status === 'running') {
         console.info(`Container "${CONTAINER_NAME}" is already running`);
         return;

@@ -22,10 +22,8 @@ const getRawClientConfig = (region: string, profile: string): DynamoDBClientConf
   /* istanbul ignore else */
   if (isLocal) {
     config.endpoint = LOCAL_ENDPOINT;
-  }
-
-  /* istanbul ignore else */
-  if (hasAwsCredentials) {
+    config.credentials = { accessKeyId: 'local', secretAccessKey: 'local' };
+  } else if (hasAwsCredentials) {
     config.credentials = fromIni({ profile });
   }
 

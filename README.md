@@ -26,6 +26,14 @@ Tests require DynamoDB Local to be running on port 8000.
 
 **macOS** — uses [apple/container](https://github.com/apple/container) (requires macOS 26+):
 
+Install `container` via Homebrew:
+
+```sh
+brew install apple/apple/container
+```
+
+Then start the service and run tests:
+
 ```sh
 container system start
 npm test
