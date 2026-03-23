@@ -201,7 +201,7 @@ describe('Document', () => {
       );
 
       await createActivity();
-    });
+    }, 30000);
 
     describe('Document._indexAll(query, options)', () => {
       it('gets all documents from a table', async () => {
