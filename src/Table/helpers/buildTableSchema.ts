@@ -1,6 +1,7 @@
 import { uniq } from 'lodash';
 import type { TableOptions, PrimaryKey, LSI, GSI } from './getTableOptions';
 import {
+  type Projection,
   type CreateTableInput,
   type LocalSecondaryIndex,
   type GlobalSecondaryIndex
@@ -11,8 +12,20 @@ const ProvisionedThroughput = {
   WriteCapacityUnits: 1,
 };
 
-const Projection = {
-  ProjectionType: 'ALL'
+/** Returns projection of an index: all attributes unless a list is given. */
+const getProjection = (projection?: string[]): Projection => {
+  if (!projection) {
+    return { ProjectionType: 'ALL' };
+  }
+
+  const NonKeyAttributes = uniq(projection);
+  const isKeysOnly = NonKeyAttributes.length === 0;
+
+  if (isKeysOnly) {
+    return { ProjectionType: 'KEYS_ONLY' };
+  }
+
+  return { ProjectionType: 'INCLUDE', NonKeyAttributes };
 };
 
 /** Returns attribute definitions for table schema. */
@@ -54,7 +67,8 @@ const getAttributeDefinitions = (
 const getSecondaryIndex = (
   IndexName: string,
   partitionKey: string,
-  sortKey?: string
+  sortKey: string,
+  projection?: string[]
 ) => {
   const KeySchema = [
     {
@@ -66,6 +80,8 @@ const getSecondaryIndex = (
       AttributeName: sortKey
     },
   ];
+
+  const Projection = getProjection(projection);
 
   const index = {
     IndexName,
@@ -82,7 +98,9 @@ const getLocalSecondaryIndexes = (
   localSecondaryIndexes: LSI[]
 ): LocalSecondaryIndex[] => {
   const indexes = localSecondaryIndexes
-    .map(({ name, sortKey }) => getSecondaryIndex(name, partitionKey, sortKey));
+    .map(({ name, sortKey, projection }) =>
+      getSecondaryIndex(name, partitionKey, sortKey, projection)
+    );
 
   return indexes;
 };
@@ -90,8 +108,8 @@ const getLocalSecondaryIndexes = (
 /** Returns schemas for global secondary indexes. */
 const getGlobalSecondaryIndexes = (globalSecondaryIndexes: GSI[], isLocalhost: boolean) => {
   const indexes = globalSecondaryIndexes
-    .map(({ name, partitionKey, sortKey }) =>
-      getSecondaryIndex(name, partitionKey, sortKey)
+    .map(({ name, partitionKey, sortKey, projection }) =>
+      getSecondaryIndex(name, partitionKey, sortKey, projection)
     ) as GlobalSecondaryIndex[];
 
   /* istanbul ignore next */

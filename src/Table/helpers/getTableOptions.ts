@@ -10,12 +10,16 @@ const PRIVATE_PROFILE = 'private';
 export type LSI = {
   name: string;
   sortKey: string;
+  /** Attributes copied to the index next to the keys; all if not set. */
+  projection?: string[];
 };
 
 export type GSI = {
   name: string;
   partitionKey: string;
   sortKey: string;
+  /** Attributes copied to the index next to the keys; all if not set. */
+  projection?: string[];
 };
 
 export type PrimaryKey = {

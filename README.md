@@ -20,6 +20,35 @@ List supported DynamoDB table commands:
 npx table
 ```
 
+## Indexes
+
+A table is created with three local secondary indexes, `lsi1` to `lsi3`, and
+three global ones, `gsi1` to `gsi3`. Define `dynamodb.localSecondaryIndexes`
+or `dynamodb.globalSecondaryIndexes` in the config to replace either list:
+
+```yaml
+dynamodb:
+  globalSecondaryIndexes:
+    - name: gsi1
+      partitionKey: _gsi1PartitionKey
+      sortKey: _gsi1SortKey
+      projection:
+        - name
+        - status
+```
+
+`projection` is optional, for an index of either kind:
+
+- **Not set** — the index holds every attribute of an item (`ALL`).
+- **A list of attribute names** — the index holds those attributes and the
+  keys (`INCLUDE`); a read of it costs less, and returns items with nothing
+  else: the listed attributes, the keys of the table, and the keys of the
+  index.
+- **An empty list** — the index holds the keys alone (`KEYS_ONLY`).
+
+A projection is set when the table is created: to change it, create the
+table again.
+
 ## Development
 
 Tests require DynamoDB Local to be running on port 8000.
@@ -77,5 +106,5 @@ ISC
 
 ---
 
-Revision: March 23, 2026<br/>
+Revision: November 16, 2026<br/>
 By: Oleksandr Kravets (@alexkravets)

@@ -61,4 +61,52 @@ describe('Table', () => {
         .toThrow('Table "kravc-dos-dynamodb" does not exist');
     });
   });
+
+  describe('Table.listItems(query, options) for an index with a projection', () => {
+    const projectedTable = new Table({
+      sortKey: 'id',
+      partitionKey: 'partition',
+    });
+
+    projectedTable.options.name = 'kravc-dos-dynamodb-projection';
+    projectedTable.options.localSecondaryIndexes = [];
+    projectedTable.options.globalSecondaryIndexes = [
+      {
+        name: 'gsi1',
+        sortKey: '_gsi1SortKey',
+        partitionKey: '_gsi1PartitionKey',
+        projection: [ 'name' ],
+      },
+    ];
+
+    beforeAll(() => projectedTable.reset());
+
+    afterAll(() => projectedTable.delete());
+
+    it('returns the projected attributes and the keys', async () => {
+      await projectedTable.createItem({
+        id: 'AST_1',
+        name: 'Text Document',
+        status: 'ACTIVE',
+        partition: 'ORG_1',
+        _gsi1SortKey: '#2026-11-16',
+        _gsi1PartitionKey: 'AST#ACTIVE',
+      });
+
+      const query = { _gsi1PartitionKey: 'AST#ACTIVE' };
+      const options = { limit: 100, sort: 'asc', indexName: 'gsi1' };
+
+      const { items } = await projectedTable.listItems(query, options);
+
+      expect(items).toEqual([
+        {
+          id: 'AST_1',
+          name: 'Text Document',
+          partition: 'ORG_1',
+          _gsi1SortKey: '#2026-11-16',
+          _gsi1PartitionKey: 'AST#ACTIVE',
+        },
+      ]);
+    });
+  });
 });
