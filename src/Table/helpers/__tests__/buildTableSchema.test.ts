@@ -37,51 +37,48 @@ describe('buildTableSchema(tableOptions)', () => {
   it('projects the listed attributes to an index', () => {
     const tableOptions = getTableOptions('partition', 'id');
 
-    tableOptions.localSecondaryIndexes = [
-      { name: 'lsi1', sortKey: '_lsi1SortKey', projection: [ 'name' ] },
-    ];
-
-    tableOptions.globalSecondaryIndexes = [
-      {
-        name: 'gsi1',
-        sortKey: '_gsi1SortKey',
-        partitionKey: '_gsi1PartitionKey',
-        projection: [ 'name', 'status', 'name' ],
-      },
-    ];
+    tableOptions.indexProjections = {
+      lsi1: [ 'name' ],
+      gsi1: [ 'name', 'status', 'name' ],
+    };
 
     const tableSchema = buildTableSchema(tableOptions);
 
-    const [ lsi ] = tableSchema.LocalSecondaryIndexes!;
-    const [ gsi ] = tableSchema.GlobalSecondaryIndexes!;
+    const [ lsi1, lsi2 ] = tableSchema.LocalSecondaryIndexes!;
+    const [ gsi1, gsi2 ] = tableSchema.GlobalSecondaryIndexes!;
 
-    expect(lsi.Projection).toEqual({
+    expect(lsi1.Projection).toEqual({
       ProjectionType: 'INCLUDE',
       NonKeyAttributes: [ 'name' ],
     });
 
-    expect(gsi.Projection).toEqual({
+    expect(gsi1.Projection).toEqual({
       ProjectionType: 'INCLUDE',
       NonKeyAttributes: [ 'name', 'status' ],
     });
+
+    expect(lsi2.Projection).toEqual({ ProjectionType: 'ALL' });
+    expect(gsi2.Projection).toEqual({ ProjectionType: 'ALL' });
   });
 
   it('projects only the keys to an index with an empty list', () => {
     const tableOptions = getTableOptions('partition', 'id');
 
-    tableOptions.globalSecondaryIndexes = [
-      {
-        name: 'gsi1',
-        sortKey: '_gsi1SortKey',
-        partitionKey: '_gsi1PartitionKey',
-        projection: [],
-      },
-    ];
+    tableOptions.indexProjections = { gsi1: [] };
 
     const tableSchema = buildTableSchema(tableOptions);
 
     const [ gsi ] = tableSchema.GlobalSecondaryIndexes!;
 
     expect(gsi.Projection).toEqual({ ProjectionType: 'KEYS_ONLY' });
+  });
+
+  it('throws an exception if a projection is given for an index that is not defined', () => {
+    const tableOptions = getTableOptions('partition', 'id');
+
+    tableOptions.indexProjections = { gsi4: [ 'name' ] };
+
+    expect(() => buildTableSchema(tableOptions))
+      .toThrow('Index "gsi4" of index projections is not defined, indexes: lsi1, lsi2, lsi3, gsi1, gsi2, gsi3');
   });
 });

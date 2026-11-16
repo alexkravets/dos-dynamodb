@@ -69,15 +69,7 @@ describe('Table', () => {
     });
 
     projectedTable.options.name = 'kravc-dos-dynamodb-projection';
-    projectedTable.options.localSecondaryIndexes = [];
-    projectedTable.options.globalSecondaryIndexes = [
-      {
-        name: 'gsi1',
-        sortKey: '_gsi1SortKey',
-        partitionKey: '_gsi1PartitionKey',
-        projection: [ 'name' ],
-      },
-    ];
+    projectedTable.options.indexProjections = { gsi1: [ 'name' ] };
 
     beforeAll(() => projectedTable.reset());
 

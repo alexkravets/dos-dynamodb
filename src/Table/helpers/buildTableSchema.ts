@@ -7,6 +7,8 @@ import {
   type GlobalSecondaryIndex
 } from '@aws-sdk/client-dynamodb';
 
+type IndexProjections = TableOptions['indexProjections'];
+
 const ProvisionedThroughput = {
   ReadCapacityUnits: 1,
   WriteCapacityUnits: 1,
@@ -92,24 +94,47 @@ const getSecondaryIndex = (
   return index;
 };
 
+/** Throws if a projection is given for an index that is not defined. */
+const verifyIndexProjections = (
+  indexProjections: IndexProjections,
+  localSecondaryIndexes: LSI[],
+  globalSecondaryIndexes: GSI[]
+): void => {
+  const indexNames = [ ...localSecondaryIndexes, ...globalSecondaryIndexes ]
+    .map(({ name }) => name);
+
+  for (const indexName of Object.keys(indexProjections)) {
+    const isDefined = indexNames.includes(indexName);
+
+    if (!isDefined) {
+      throw new Error(`Index "${indexName}" of index projections is not defined, indexes: ${indexNames.join(', ')}`);
+    }
+  }
+};
+
 /** Returns schemas for local secondary indexes. */
 const getLocalSecondaryIndexes = (
   partitionKey: string,
-  localSecondaryIndexes: LSI[]
+  localSecondaryIndexes: LSI[],
+  indexProjections: IndexProjections
 ): LocalSecondaryIndex[] => {
   const indexes = localSecondaryIndexes
-    .map(({ name, sortKey, projection }) =>
-      getSecondaryIndex(name, partitionKey, sortKey, projection)
+    .map(({ name, sortKey }) =>
+      getSecondaryIndex(name, partitionKey, sortKey, indexProjections[name])
     );
 
   return indexes;
 };
 
 /** Returns schemas for global secondary indexes. */
-const getGlobalSecondaryIndexes = (globalSecondaryIndexes: GSI[], isLocalhost: boolean) => {
+const getGlobalSecondaryIndexes = (
+  globalSecondaryIndexes: GSI[],
+  indexProjections: IndexProjections,
+  isLocalhost: boolean
+) => {
   const indexes = globalSecondaryIndexes
-    .map(({ name, partitionKey, sortKey, projection }) =>
-      getSecondaryIndex(name, partitionKey, sortKey, projection)
+    .map(({ name, partitionKey, sortKey }) =>
+      getSecondaryIndex(name, partitionKey, sortKey, indexProjections[name])
     ) as GlobalSecondaryIndex[];
 
   /* istanbul ignore next */
@@ -126,14 +151,17 @@ const buildTableSchema = ({
   name: TableName,
   primaryKey,
   isLocalhost,
+  indexProjections,
   localSecondaryIndexes,
   globalSecondaryIndexes,
 }: TableOptions): CreateTableInput => {
   const { partitionKey, sortKey } = primaryKey;
 
+  verifyIndexProjections(indexProjections, localSecondaryIndexes, globalSecondaryIndexes);
+
   const AttributeDefinitions = getAttributeDefinitions(primaryKey, localSecondaryIndexes, globalSecondaryIndexes);
-  const LocalSecondaryIndexes = getLocalSecondaryIndexes(partitionKey, localSecondaryIndexes);
-  const GlobalSecondaryIndexes = getGlobalSecondaryIndexes(globalSecondaryIndexes, isLocalhost);
+  const LocalSecondaryIndexes = getLocalSecondaryIndexes(partitionKey, localSecondaryIndexes, indexProjections);
+  const GlobalSecondaryIndexes = getGlobalSecondaryIndexes(globalSecondaryIndexes, indexProjections, isLocalhost);
 
   const KeySchema = [
     { KeyType: 'HASH', AttributeName: partitionKey },

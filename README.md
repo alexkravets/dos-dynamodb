@@ -32,19 +32,26 @@ dynamodb:
     - name: gsi1
       partitionKey: _gsi1PartitionKey
       sortKey: _gsi1SortKey
-      projection:
-        - name
-        - status
 ```
 
-`projection` is optional, for an index of either kind:
+An index holds every attribute of an item (`ALL`). To make one hold less,
+list its attributes by the name of the index in `dynamodb.indexProjections`:
 
-- **Not set** — the index holds every attribute of an item (`ALL`).
+```yaml
+dynamodb:
+  indexProjections:
+    gsi1:
+      - name
+      - status
+```
+
 - **A list of attribute names** — the index holds those attributes and the
   keys (`INCLUDE`); a read of it costs less, and returns items with nothing
   else: the listed attributes, the keys of the table, and the keys of the
   index.
 - **An empty list** — the index holds the keys alone (`KEYS_ONLY`).
+
+Creating a table fails when a name there is not one of its indexes.
 
 A projection is set when the table is created: to change it, create the
 table again.

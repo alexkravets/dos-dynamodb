@@ -10,16 +10,12 @@ const PRIVATE_PROFILE = 'private';
 export type LSI = {
   name: string;
   sortKey: string;
-  /** Attributes copied to the index next to the keys; all if not set. */
-  projection?: string[];
 };
 
 export type GSI = {
   name: string;
   partitionKey: string;
   sortKey: string;
-  /** Attributes copied to the index next to the keys; all if not set. */
-  projection?: string[];
 };
 
 export type PrimaryKey = {
@@ -46,6 +42,8 @@ export type TableOptions = {
   region: string;
   profile: string;
   indexKeys: Record<string, LocalIndexKeyComposer | Record<string, GlobalIndexKeyComposer>>;
+  /** Attributes copied to an index next to the keys, by index name; all if not set. */
+  indexProjections: Record<string, string[]>;
   primaryKey: PrimaryKey;
   isLocalhost: boolean;
   localSecondaryIndexes: LSI[];
@@ -79,6 +77,7 @@ const getTableOptions = (partitionKey: string, sortKey: string): TableOptions =>
 
   const name = get(tableConfig, 'name', getDefaultName());
   const indexKeys = get(tableConfig, 'indexKeys', {});
+  const indexProjections = get(tableConfig, 'indexProjections', {});
 
   const region = get(config, 'aws.region', LOCAL_REGION);
   const profile = get(config, 'aws.profile', PRIVATE_PROFILE);
@@ -92,6 +91,7 @@ const getTableOptions = (partitionKey: string, sortKey: string): TableOptions =>
   tableOptions.region = region;
   tableOptions.profile = profile;
   tableOptions.indexKeys = indexKeys;
+  tableOptions.indexProjections = indexProjections;
   tableOptions.primaryKey = primaryKey;
   tableOptions.isLocalhost = region === LOCAL_REGION;
 
