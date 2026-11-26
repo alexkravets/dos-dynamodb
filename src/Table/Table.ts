@@ -1,5 +1,5 @@
 import type { MutationMap, QueryMap } from '@kravc/dos';
-import { DynamoDBClient, DeleteTableCommand, CreateTableCommand } from '@aws-sdk/client-dynamodb';
+import { type DynamoDBClient, DeleteTableCommand, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 
 import {
   type PutCommandInput,
@@ -7,15 +7,15 @@ import {
   type QueryCommandInput,
   type QueryCommandOutput,
   type DeleteCommandInput,
-  DynamoDBDocument,
-  UpdateCommandInput,
+  type DynamoDBDocument,
+  type UpdateCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 
 import {
   type TableOptions,
+  getClient,
   getTableOptions,
   buildTableSchema,
-  getRawClientConfig,
   buildUpdateExpression,
   buildQueryCommandInput,
   buildConditionExpression,
@@ -42,10 +42,10 @@ class Table {
     const tableOptions = getTableOptions(partitionKey, sortKey);
 
     const { region, profile } = tableOptions;
-    const config = getRawClientConfig(region, profile);
+    const { rawClient, documentClient } = getClient(region, profile);
 
-    this._rawClient = new DynamoDBClient(config);
-    this._client = DynamoDBDocument.from(this._rawClient);
+    this._rawClient = rawClient;
+    this._client = documentClient;
 
     this._tableOptions = tableOptions;
   }

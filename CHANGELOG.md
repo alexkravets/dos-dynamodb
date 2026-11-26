@@ -5,6 +5,22 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com), and
 this package adheres to [Semantic Versioning](https://semver.org).
 
+## [1.1.2] - 2026-11-26
+
+### Fixed
+
+- A process no longer opens connections to DynamoDB until it has no more
+  to open (`EMFILE`): every read of `Document.table` made a table with a
+  client of its own, several a request, and none was closed. A document
+  class keeps one table, and the tables of a region share one client.
+- The name of the package is no longer read from `package.json` for a
+  table named in `dynamodb.name`.
+
+### Changed
+
+- `Document.table` returns the same `Table` at every read, so a change
+  to its `options` stays.
+
 ## [1.1.1] - 2026-11-16
 
 ### Added
@@ -45,6 +61,7 @@ which 1.1.1 replaces with `dynamodb.indexProjections`.
   `dynamodb.indexKeys` templates.
 - `table` command to create, delete, and reset a table.
 
+[1.1.2]: https://github.com/alexkravets/dos-dynamodb/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/alexkravets/dos-dynamodb/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/alexkravets/dos-dynamodb/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/alexkravets/dos-dynamodb/compare/v1.0.1...v1.0.2

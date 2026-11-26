@@ -75,7 +75,7 @@ const getTableOptions = (partitionKey: string, sortKey: string): TableOptions =>
   const tableConfig = config.get('dynamodb');
   const tableOptions = JSON.parse(JSON.stringify(tableConfig)) as TableOptions;
 
-  const name = get(tableConfig, 'name', getDefaultName());
+  const name = (get(tableConfig, 'name') as string | undefined) ?? getDefaultName();
   const indexKeys = get(tableConfig, 'indexKeys', {});
   const indexProjections = get(tableConfig, 'indexProjections', {});
 

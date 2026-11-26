@@ -1,5 +1,6 @@
+import http from 'node:http';
 import { ExpressionKey } from '../../../';
-import { Activity, Asset } from '../../../example';
+import { Activity, Asset, Organization } from '../../../example';
 import { DocumentExistsError, DocumentNotFoundError } from '@kravc/dos';
 import { createContext, createAsset, createActivity, createOrganization } from './__helpers';
 
@@ -24,6 +25,37 @@ describe('Document', () => {
   describe('Document.indexLimitMax', () => {
     it('returns maximum value for the limit parameter of the index operation', async () => {
       expect(Asset.indexLimitMax).toEqual(999);
+    });
+  });
+
+  describe('Document.table', () => {
+    it('returns the same table at every read', () => {
+      expect(Asset.table).toBe(Asset.table);
+    });
+
+    it('returns a table of its own for each document class', () => {
+      expect(Activity.table).not.toBe(Asset.table);
+      expect(Organization.table).not.toBe(Asset.table);
+    });
+
+    it('opens no connection for a request', async () => {
+      const connectionSpy = jest.spyOn(http.Agent.prototype, 'createConnection');
+
+      for (let index = 0; index < 50; index++) {
+        const { id } = await createAsset();
+
+        await Asset.read(context, { id });
+        await Asset.update(context, { id }, { name: 'Renamed Document' });
+        await Asset.index(context, {}, { limit: 1 });
+        await Asset.delete(context, { id });
+        await createActivity();
+      }
+
+      const connectionsCount = connectionSpy.mock.calls.length;
+
+      connectionSpy.mockRestore();
+
+      expect(connectionsCount).toBeLessThanOrEqual(1);
     });
   });
 

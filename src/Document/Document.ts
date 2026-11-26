@@ -22,14 +22,28 @@ const ATTRIBUTE_ERROR_TEMPLATE = 'Attribute "$PATH" is required';
 const INDEX_ALL_LIMIT = 300;
 const INDEX_LIMIT_MAX = 999;
 
+/*
+ * The table of each document class, made at its first read: a class has
+ * keys of its own, so a table is never the one of a parent class.
+ */
+const tables = new WeakMap<object, Table>();
+
 /** Document class with DynamoDB database interface. */
 class Document<T> extends MemoryDocument<T> {
-  /** Returns the table instance used to store a document. */
+  /** Returns the table used to store a document, the same at every read. */
   static get table(): Table {
-    return new Table({
-      sortKey: this.idKey,
-      partitionKey: this.partitionKey,
-    });
+    let table = tables.get(this);
+
+    if (!table) {
+      table = new Table({
+        sortKey: this.idKey,
+        partitionKey: this.partitionKey,
+      });
+
+      tables.set(this, table);
+    }
+
+    return table;
   }
 
   /** Returns prefix for new document IDs. */

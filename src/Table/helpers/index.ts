@@ -1,3 +1,4 @@
+import getClient from './getClient';
 import buildTableSchema from './buildTableSchema';
 import getRawClientConfig from './getRawClientConfig';
 import buildUpdateExpression from './buildUpdateExpression';
@@ -7,6 +8,7 @@ import filterConditionExpression from './filterConditionExpression';
 import getTableOptions, { type TableOptions } from './getTableOptions';
 
 export {
+  getClient,
   getTableOptions,
   buildTableSchema,
   getRawClientConfig,
